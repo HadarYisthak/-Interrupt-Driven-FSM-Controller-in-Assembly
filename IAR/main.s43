@@ -1,0 +1,60 @@
+#include  "bsp.h"
+
+             NAME   MAIN
+             PUBLIC state, main
+             EXTERN SysConfig,ClrLEDs,IncLED,DecLED,delay,DecCounter,PrintDecCounter2LEDs,delay_0_5_sec
+             EXTERN PrintLEDs,ReadSWs,PrintSWs2LEDs,ShiftLeftCounter,PrintShiftCounter2LEDs,FiveSec1khz,FiveSec2khz, DecCounter, PrintZeros2LEDs
+             
+;----------------------------------------------------------------------------------
+             ORG      DataSegStart         ; Begins a DATA segment
+             
+state        DW   0                        ; state variable
+
+;-------------------------------------------------------------------------------------          
+             ;RSEG    CSTACK    ; shows to compiler where is the RAM populating limit
+                                ; can be ignored
+;-------------------------------------------------------------------------------------
+             ORG     CodeSegStart       ; Program Reset = Begins a CODE segment
+             
+main         mov.w   #StackTosStart,SP  ; Initialize stack pointer to the RAM end 
+             call    #SysConfig
+             clr     state              ; set to idle state at the beginning
+
+;---------------------- FSM_loop -------------------------------------
+state0       cmp     #0x00, state         ;check if state0           
+             jnz     state1
+             call    #PrintZeros2LEDs
+             bis.w   #CPUOFF+GIE,SR 
+
+state1       cmp     #0x01, state         ;check if state1
+             jnz     state2
+             mov     #20, R15 
+             DINT
+state1_L     call    #PrintDecCounter2LEDs
+             call    #DecCounter     
+             call    #delay_0_5_sec
+             dec.w   R15     
+             jnz     state1_L 
+             EINT
+            
+state2       cmp     #0x02, state  ;check if state2
+             jnz     state3  
+             mov     #10, R15 
+             DINT
+state2_L     call    #PrintShiftCounter2LEDs
+             call    #ShiftLeftCounter
+             call    #delay_0_5_sec
+             dec.w   R15     
+             jnz     state2_L 
+             EINT       
+                 
+state3       cmp     #0x03, state         ;check if state3
+             jnz     state0
+             DINT
+             call    #FiveSec1khz
+             call    #FiveSec2khz
+             EINT
+             jmp     state0
+
+
+             END
