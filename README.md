@@ -5,7 +5,7 @@ This project presents a practical and layered software architecture for an inter
 
 At system start-up, the microcontroller enters Sleep Mode (state=idle). When a push-button interrupt is triggered, the system transitions into one of four FSM states, each representing a unique and time-constrained LED behavior or signal output. A detailed FSM diagram is constructed in the planning phase to define all states and transitions triggered by interrupts.
 
-💡 FSM State Functions:
+FSM State Functions:
 State 1 (PB0) – Binary Countdown:
 Displays a binary countdown from 0xFx to 0x00 on the LED array in 0.5-second intervals for 10 seconds. The countdown is cyclic and maintains the last displayed value for continuation in the next cycle.
 
